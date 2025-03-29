@@ -50,3 +50,6 @@ URL_LOGIN = '/auth/jwt/login'
 """
 Урл для авторизации.
 """
+DATABASE_URL_FRO_TEST = (
+    'postgresql+asyncpg://postgres:postgres@localhost:5432/wallet_db'
+)
