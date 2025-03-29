@@ -1,0 +1,25 @@
+import pytest
+from httpx import AsyncClient
+
+from app.core.constants import (DATA_FOR_TESTS, INVALID_ADDRESS, URL_APP_DEV,
+                                URL_LOGIN)
+
+
+@pytest.mark.asyncio
+async def test_post_not_validate_address():
+    async with AsyncClient(base_url=URL_APP_DEV) as client:
+        response = await client.post(
+            URL_LOGIN,
+            data=DATA_FOR_TESTS,
+        )
+        assert response.status_code == 200, (
+            f'Ошибка при входе: {response.json()}')
+        token = response.json().get('access_token')
+        assert token, 'Токен не был получен'
+        headers = {'Authorization': f'Bearer {token}'}
+        response = await client.post(
+            f'/api/v1/wallet/{INVALID_ADDRESS}',
+            headers=headers,
+        )
+        assert response.status_code == 400, (
+            f'Ошибка при создании операции: {response.json()}')

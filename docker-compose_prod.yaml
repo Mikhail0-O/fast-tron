@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: TronWallet-DB
+    env_file:
+      - .env
+    volumes:
+      - tron_pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - tron_wallet_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: TrontWallet-WEB
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - tron_wallet_net
+
+networks:
+  tron_wallet_net:
+
+volumes:
+  tron_pg_data:
